@@ -1,0 +1,372 @@
+{
+  "_comment": "Silent Hill: Homecoming (PC) cvar -> settings-object field map. Recovered by parsing the registration function FUN_10A27970 for the 'lea ecx,[esi+disp]; push ecx; push <name>' pattern. 'offset' is the field offset within the settings object, which is reached at runtime as *(*(*(0x111D2460)+0x38)+8). Build v6.30 (#640742).",
+  "_settings_object": "*(*(*(0x111D2460) + 0x38) + 8)",
+  "_build": "v6.30 changelist #640742, md5 2af20d3f0b1d3902135a044966859d39",
+  "_note_dead_cvars": "fpsLimit and maxFPSLimit are registered, parsed, clamped and saved correctly but are never read by the render loop. ScreenRefresh only feeds the D3D9 display mode. The real frame cap is a float at VA 0x1108E804 read by FUN_10A4CC90.",
+  "cvars": {
+    "aiDisabled": {
+      "offset": "0xF0",
+      "register_site_va": "0x10A27D7C"
+    },
+    "allshadows": {
+      "offset": "0x4D",
+      "register_site_va": "0x10A27EFC"
+    },
+    "attachments": {
+      "offset": "0x7F",
+      "register_site_va": "0x10A27F2C"
+    },
+    "buglog": {
+      "offset": "0x55",
+      "register_site_va": "0x10A284DD"
+    },
+    "cameraCombatRange": {
+      "offset": null,
+      "register_site_va": "0x10A28693"
+    },
+    "cameraDistance": {
+      "offset": null,
+      "register_site_va": "0x10A2860F"
+    },
+    "cameraInvertFirstVert": {
+      "offset": null,
+      "register_site_va": "0x10A286C3"
+    },
+    "cameraInvertThirdHoriz": {
+      "offset": "0x1A2",
+      "register_site_va": "0x10A28723"
+    },
+    "cameraInvertThirdVert": {
+      "offset": "0x1A1",
+      "register_site_va": "0x10A286F3"
+    },
+    "cameraResetDelay": {
+      "offset": null,
+      "register_site_va": "0x10A28651"
+    },
+    "characterInputDebug": {
+      "offset": "0x51",
+      "register_site_va": "0x10A28414"
+    },
+    "charfade": {
+      "offset": "0x59",
+      "register_site_va": "0x10A27FD6"
+    },
+    "collisionWindow": {
+      "offset": "0x28",
+      "register_site_va": "0x10A27DE6"
+    },
+    "dbanim": {
+      "offset": "0x1D8",
+      "register_site_va": "0x10A28CA5"
+    },
+    "dbgPrefChar": {
+      "offset": "0x1E4",
+      "register_site_va": "0x10A28BB6"
+    },
+    "deathtime": {
+      "offset": null,
+      "register_site_va": "0x10A2810B"
+    },
+    "debugCamera": {
+      "offset": "0x1A3",
+      "register_site_va": "0x10A28753"
+    },
+    "debuggerAbsent": {
+      "offset": "0x1D7",
+      "register_site_va": "0x10A28C6B"
+    },
+    "debugKillAllies": {
+      "offset": "0xEF",
+      "register_site_va": "0x10A284AD"
+    },
+    "debugtest": {
+      "offset": "0x1C4",
+      "register_site_va": "0x10A28A5A"
+    },
+    "defaultfov": {
+      "offset": null,
+      "register_site_va": "0x10A28240"
+    },
+    "dhAIDebug": {
+      "offset": "0x1E2",
+      "register_site_va": "0x10A28B79"
+    },
+    "dhAimBoneIndex": {
+      "offset": "0x1E8",
+      "register_site_va": "0x10A28B13"
+    },
+    "disableIK": {
+      "offset": "0x1E1",
+      "register_site_va": "0x10A28B46"
+    },
+    "drawRenderBounds": {
+      "offset": "0x15D",
+      "register_site_va": "0x10A27E5F"
+    },
+    "facialAnimMaxWeight": {
+      "offset": null,
+      "register_site_va": "0x10A27CCA"
+    },
+    "fov": {
+      "offset": null,
+      "register_site_va": "0x10A28289"
+    },
+    "fps": {
+      "offset": "0x50",
+      "register_site_va": "0x10A283E4"
+    },
+    "fpsLimit": {
+      "offset": "0xE4",
+      "register_site_va": "0x10A27F69"
+    },
+    "FullScreen": {
+      "offset": "0x208",
+      "register_site_va": "0x10A28E62"
+    },
+    "gamma": {
+      "offset": null,
+      "register_site_va": "0x10A28A2A"
+    },
+    "god": {
+      "offset": "0xF5",
+      "register_site_va": "0x10A28381"
+    },
+    "gravity": {
+      "offset": "0xE0",
+      "register_site_va": "0x10A27C51"
+    },
+    "grid": {
+      "offset": null,
+      "register_site_va": "0x10A27D0C"
+    },
+    "headTracking": {
+      "offset": "0x1FA",
+      "register_site_va": "0x10A28D78"
+    },
+    "hud": {
+      "offset": null,
+      "register_site_va": "0x10A27E2C"
+    },
+    "interactivemesh": {
+      "offset": "0x1F8",
+      "register_site_va": "0x10A28D12"
+    },
+    "logCinematics": {
+      "offset": "0xF",
+      "register_site_va": "0x10A2856D"
+    },
+    "logMusic": {
+      "offset": "0x10",
+      "register_site_va": "0x10A2859D"
+    },
+    "logPickupPhysics": {
+      "offset": "0x11",
+      "register_site_va": "0x10A285CD"
+    },
+    "logRumble": {
+      "offset": "0x15F",
+      "register_site_va": "0x10A2893A"
+    },
+    "logSplats": {
+      "offset": "0xD",
+      "register_site_va": "0x10A2850D"
+    },
+    "logTriggers": {
+      "offset": "0xE",
+      "register_site_va": "0x10A2853D"
+    },
+    "LowQualityShaders": {
+      "offset": "0x209",
+      "register_site_va": "0x10A28E95"
+    },
+    "maxFPSLimit": {
+      "offset": "0xE8",
+      "register_site_va": "0x10A27FA6"
+    },
+    "maxlights": {
+      "offset": "0xDC",
+      "register_site_va": "0x10A27E99"
+    },
+    "microsecondmin": {
+      "offset": "0x18C",
+      "register_site_va": "0x10A281C4"
+    },
+    "minsoundreport": {
+      "offset": "0x134",
+      "register_site_va": "0x10A28009"
+    },
+    "mousespeed": {
+      "offset": null,
+      "register_site_va": "0x10A28AA3"
+    },
+    "noCheat": {
+      "offset": "0xFA",
+      "register_site_va": "0x10A28447"
+    },
+    "nogamepadCheat": {
+      "offset": "0xFB",
+      "register_site_va": "0x10A2847A"
+    },
+    "noMusic": {
+      "offset": "0x14C",
+      "register_site_va": "0x10A28085"
+    },
+    "particleAxisSize": {
+      "offset": null,
+      "register_site_va": "0x10A287F9"
+    },
+    "physics": {
+      "offset": "0x15",
+      "register_site_va": "0x10A27DAC"
+    },
+    "psysDynLightsEnabled": {
+      "offset": "0x1BD",
+      "register_site_va": "0x10A281F7"
+    },
+    "rangedAimWeight": {
+      "offset": null,
+      "register_site_va": "0x10A28C38"
+    },
+    "rangedStrafeWeight": {
+      "offset": null,
+      "register_site_va": "0x10A28BF7"
+    },
+    "rumble": {
+      "offset": "0x15E",
+      "register_site_va": "0x10A28907"
+    },
+    "rumbleScale": {
+      "offset": null,
+      "register_site_va": "0x10A2897B"
+    },
+    "ScreenRefresh": {
+      "offset": "0x204",
+      "register_site_va": "0x10A28E2F"
+    },
+    "ScreenResHeight": {
+      "offset": "0x200",
+      "register_site_va": "0x10A28DF2"
+    },
+    "ScreenResWidth": {
+      "offset": "0x1FC",
+      "register_site_va": "0x10A28DB5"
+    },
+    "shadows": {
+      "offset": "0x4E",
+      "register_site_va": "0x10A27ECC"
+    },
+    "subtitles": {
+      "offset": "0x164",
+      "register_site_va": "0x10A289AE"
+    },
+    "timermaxcount": {
+      "offset": "0x188",
+      "register_site_va": "0x10A280C2"
+    },
+    "timeScaleFast": {
+      "offset": null,
+      "register_site_va": "0x10A2831B"
+    },
+    "timeScaleSlow": {
+      "offset": null,
+      "register_site_va": "0x10A282D2"
+    },
+    "tips": {
+      "offset": "0x165",
+      "register_site_va": "0x10A289E1"
+    },
+    "transInfo": {
+      "offset": "0x1B3",
+      "register_site_va": "0x10A2834E"
+    },
+    "triggerLogUnnamed": {
+      "offset": "0x1B0",
+      "register_site_va": "0x10A28783"
+    },
+    "useranges": {
+      "offset": "0xF7",
+      "register_site_va": "0x10A283B4"
+    },
+    "volume": {
+      "offset": null,
+      "register_site_va": "0x10A28052"
+    },
+    "volumefx": {
+      "offset": null,
+      "register_site_va": "0x10A2888B"
+    },
+    "volumemusic": {
+      "offset": null,
+      "register_site_va": "0x10A28842"
+    },
+    "volumevoice": {
+      "offset": "0x144",
+      "register_site_va": "0x10A288D4"
+    },
+    "vsync": {
+      "offset": "0xE2",
+      "register_site_va": "0x10A27C84"
+    },
+    "warn_animation": {
+      "offset": "0x12C",
+      "register_site_va": "0x10A279A8"
+    },
+    "warn_audio": {
+      "offset": "0x12D",
+      "register_site_va": "0x10A279E7"
+    },
+    "warn_characterart": {
+      "offset": "0x12F",
+      "register_site_va": "0x10A27A65"
+    },
+    "warn_cinematics": {
+      "offset": "0x12E",
+      "register_site_va": "0x10A27A26"
+    },
+    "warn_design": {
+      "offset": "0x130",
+      "register_site_va": "0x10A27AA4"
+    },
+    "warn_environmentalart": {
+      "offset": "0x131",
+      "register_site_va": "0x10A27AE3"
+    },
+    "warn_fxart": {
+      "offset": "0x132",
+      "register_site_va": "0x10A27B22"
+    },
+    "warn_leveldesign": {
+      "offset": "0x134",
+      "register_site_va": "0x10A27BA0"
+    },
+    "warn_miscart": {
+      "offset": "0x135",
+      "register_site_va": "0x10A27BDF"
+    },
+    "warn_programming": {
+      "offset": "0x136",
+      "register_site_va": "0x10A27C1E"
+    },
+    "warn_scripting": {
+      "offset": "0x133",
+      "register_site_va": "0x10A27B61"
+    },
+    "watchifgosted": {
+      "offset": "0x15C",
+      "register_site_va": "0x10A28187"
+    },
+    "watchmode": {
+      "offset": "0x190",
+      "register_site_va": "0x10A27D49"
+    },
+    "watchrange": {
+      "offset": null,
+      "register_site_va": "0x10A28154"
+    },
+    "woundmanager": {
+      "offset": "0x1F9",
+      "register_site_va": "0x10A28D45"
+    }
+  }
+}

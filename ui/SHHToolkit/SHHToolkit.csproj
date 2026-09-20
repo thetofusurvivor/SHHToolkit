@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>SHHToolkit</AssemblyName>
+    <RootNamespace>SHHToolkit</RootNamespace>
+    <Product>Silent Hill: Homecoming PC Speedrunning Toolkit</Product>
+    <Version>1.0.0</Version>
+    <Authors>thetofusurvivor_</Authors>
+    <Company>thetofusurvivor_</Company>
+    <Copyright>thetofusurvivor_</Copyright>
+    <Description>Speedrunning patches and practice tools for the PC release of Silent Hill: Homecoming.</Description>
+    <!-- 64-bit: it patches a 32-bit game from outside, which WOW64 allows -->
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <!--
+    The game's logo and the icon built from it are the publisher's artwork, so they are
+    not in the repository. Both are optional: without them the app shows no header image
+    and gets the default .NET icon, and the build still succeeds.
+  -->
+  <PropertyGroup Condition="Exists('icon.ico')">
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <!--
+    Publishing profile: one portable .exe that needs nothing installed.
+
+    Self-contained means the .NET runtime travels inside the file, so a tester who has
+    never installed .NET can double-click it. That is what makes it ~150 MB before
+    compression; WPF cannot be trimmed (the XAML loader resolves types by name at
+    runtime, so the trimmer would cut code that is really used), which is why
+    PublishTrimmed is deliberately absent.
+  -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <!-- InvariantGlobalization must stay OFF: WPF's font cache initialises culture data,
+         and with it on the app dies at startup with "The type initializer for
+         'MS.Internal.FontCache.MajorLanguages' threw an exception". -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="logo.png" Condition="Exists('logo.png')" />
+  </ItemGroup>
+
+</Project>

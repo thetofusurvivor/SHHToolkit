@@ -1,0 +1,204 @@
+<Window x:Class="SHHToolkit.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Silent Hill: Homecoming - PC Speedrunning Toolkit (beta)"
+        Height="700" Width="760" MinHeight="520" MinWidth="640"
+        Background="{StaticResource FogBrush}" WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+
+    <Window.Resources>
+        <DataTemplate x:Key="RowTemplate">
+            <Border Style="{StaticResource Row}" ToolTip="{Binding Tooltip}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                        <TextBlock Text="{Binding Name}" Style="{StaticResource Title}" />
+                        <TextBlock Text="{Binding Summary}" Style="{StaticResource Secondary}" Margin="0,3,0,0"
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Detail}" Style="{StaticResource Mono}" Margin="0,5,0,0"
+                                   Visibility="{Binding HasDetail, Converter={StaticResource BoolToVis}}" />
+                    </StackPanel>
+                    <ToggleButton Grid.Column="1" Style="{StaticResource Toggle}" VerticalAlignment="Center"
+                                  IsChecked="{Binding IsOn, Mode=OneWay}" IsEnabled="{Binding CanToggle}"
+                                  Click="OnRowToggle" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Rectangle Grid.RowSpan="5" Fill="{StaticResource VignetteBrush}" IsHitTestVisible="False" />
+
+        <!-- header -->
+        <Border Grid.Row="0" BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1" Padding="20,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Source is set in code: the artwork is optional and absent from the
+                     repository, and a missing resource here would throw at load. -->
+                <Image x:Name="LogoImage" Grid.Column="0" Width="52" Height="52" VerticalAlignment="Center"
+                       RenderOptions.BitmapScalingMode="HighQuality" Visibility="Collapsed" />
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,16,0">
+                    <TextBlock Text="SILENT HILL: HOMECOMING" Style="{StaticResource Serif.Heading}"
+                               FontSize="17" />
+                    <TextBlock Text="PC Speedrunning Toolkit" Style="{StaticResource Secondary}" Margin="1,3,0,0" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <Border BorderBrush="{StaticResource Accent}" BorderThickness="1" CornerRadius="2"
+                            Padding="6,2" Background="#332A1008" HorizontalAlignment="Right">
+                        <TextBlock Text="BETA" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="#FFC9704F" />
+                    </Border>
+                    <TextBlock Text="by thetofusurvivor_" Style="{StaticResource Secondary}"
+                               HorizontalAlignment="Right" Margin="0,6,0,0" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- game path -->
+        <Border Grid.Row="1" BorderBrush="{StaticResource Border}" BorderThickness="0,0,0,1" Padding="20,10">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="GamePathText" Grid.Column="0" Style="{StaticResource Mono}"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,16,0"
+                               Text="looking for the game..." />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button Content="Browse" Click="OnBrowseClick" />
+                        <Button Content="Refresh" Click="OnRefreshClick" Margin="8,0,0,0" />
+                    </StackPanel>
+                </Grid>
+                <TextBlock x:Name="WarnText" Style="{StaticResource Secondary}" Foreground="{StaticResource Danger}"
+                           Margin="0,8,0,0" Visibility="Collapsed" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <!-- content -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Padding="20,0,14,0">
+            <StackPanel Margin="0,0,0,20">
+
+                <TextBlock Text="FRAME RATE" Style="{StaticResource SectionLabel}" />
+                <Border Style="{StaticResource Row}"
+                        ToolTip="The PC build hard-codes 30 FPS. The in-game 144 Hz option only changes the display mode, and the fpsLimit values in vars_pc.cfg are read but never used. This rewrites the frame-time constant the limiter reads.">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                            <TextBlock Text="Frame rate cap" Style="{StaticResource Title}" />
+                            <TextBlock x:Name="FpsDetail" Style="{StaticResource Secondary}" Margin="0,3,0,0" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <ComboBox x:Name="FpsCombo" Width="104" />
+                            <Button Content="Apply" Click="OnSetFpsClick" Style="{StaticResource AccentButton}"
+                                    Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <TextBlock Text="GAME SPEED" Style="{StaticResource SectionLabel}" />
+                <Border Style="{StaticResource Row}"
+                        ToolTip="Scales the engine's frame delta, so movement, animation and scripted sequences all run faster together. Capped at 4x: past that this engine's collision starts letting Alex through geometry. The stub also caps the scaled delta at 50 ms, below the 80 ms the engine itself enforces, so the worst step while sped up is smaller than the stock game's own worst frame. Pre-rendered movies run on Bink's own clock and are unaffected.">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                            <TextBlock Text="Gameplay speed" Style="{StaticResource Title}" />
+                            <TextBlock x:Name="SpeedDetail" Style="{StaticResource Secondary}" Margin="0,3,0,0" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <ComboBox x:Name="SpeedCombo" Width="104" />
+                            <Button Content="Apply" Click="OnSetSpeedClick" Style="{StaticResource AccentButton}"
+                                    Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <TextBlock Text="GAME FILES" Style="{StaticResource SectionLabel}" />
+                <ItemsControl x:Name="FilePatchList" ItemTemplate="{StaticResource RowTemplate}" />
+
+                <TextBlock Text="UNLOCKS" Style="{StaticResource SectionLabel}" />
+                <Border Style="{StaticResource Row}"
+                        ToolTip="Each ending unlocks one costume, and the Laser Gun needs the UFO ending. Ticked items are forced on; unticked ones keep whatever you actually earned. Your save file is never touched.">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                            <TextBlock Text="Costumes and extras" Style="{StaticResource Title}" />
+                            <TextBlock x:Name="UnlockDetail" Style="{StaticResource Secondary}" Margin="0,3,0,10" />
+                            <UniformGrid Columns="3">
+                                <CheckBox x:Name="CbYoung" Content="Young Alex" />
+                                <CheckBox x:Name="CbSheriff" Content="Sheriff" />
+                                <CheckBox x:Name="CbTrucker" Content="Trucker" />
+                                <CheckBox x:Name="CbOrderly" Content="Orderly" />
+                                <CheckBox x:Name="CbOrder" Content="Order Soldier" />
+                                <CheckBox x:Name="CbPyramid" Content="Pyramid Head" />
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,4,0,0">
+                                <CheckBox x:Name="CbLaser" Content="Laser Gun"
+                                          ToolTip="Sets the UFO-ending flag, which is what puts the Laser Gun in Alex's house." />
+                                <CheckBox x:Name="CbCompleted" Content="Game completed"
+                                          ToolTip="Sets the flag the game uses to treat a playthrough as finished." />
+                            </UniformGrid>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="Apply" Click="OnApplyUnlocksClick"
+                                Style="{StaticResource AccentButton}" VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <TextBlock Text="PRACTICE" Style="{StaticResource SectionLabel}" />
+                <ItemsControl x:Name="RuntimeList" ItemTemplate="{StaticResource RowTemplate}" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- log, hidden until asked for -->
+        <Border x:Name="LogPanel" Grid.Row="3" Background="#FF121416" BorderBrush="{StaticResource Border}"
+                BorderThickness="0,1,0,0" Height="132" Visibility="Collapsed">
+            <ScrollViewer x:Name="LogScroll" Padding="20,10" VerticalScrollBarVisibility="Auto">
+                <TextBlock x:Name="LogText" Style="{StaticResource Mono}" TextWrapping="Wrap" />
+            </ScrollViewer>
+        </Border>
+
+        <!-- status bar -->
+        <Border Grid.Row="4" BorderBrush="{StaticResource Border}" BorderThickness="0,1,0,0" Padding="20,7">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="StatusText" Grid.Column="0" Style="{StaticResource Secondary}"
+                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,16,0" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Log" Click="OnToggleLogClick" Style="{StaticResource QuietButton}" />
+                    <Button Content="Restore all" Click="OnRestoreAllClick" Style="{StaticResource QuietButton}"
+                            Margin="4,0,0,0" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,69 @@
+# ---------------------------------------------------------------------------
+# Game content — NEVER commit any of this. It is copyrighted Konami/Double
+# Helix material. This repo ships a patcher, not the game and not its assets.
+# ---------------------------------------------------------------------------
+backup/
+work/
+*.sgl
+*.sgl.orig
+*.exe
+*.exe.orig
+*.cfg.orig
+*.dll
+
+# game data, wherever it turns up (e.g. if the tool is ever run from the game folder)
+Bin/
+Engine/
+Data/
+Movies/
+Sound/
+*.pak
+*.bik
+*.bin
+
+# saves, and our backups of them
+shv_save*
+*.sav
+*.bak
+
+# .NET build output. Not just noise: obj/ holds the compiled WPF resource bundle
+# (SHHToolkit.g.resources), which has the header artwork baked into it — so ignoring
+# logo.png alone is not enough to keep the game's art out of the repository.
+bin/
+obj/
+*.user
+
+# Artwork: the game's logo and the icon built from it. The app looks for
+# logo.png and simply shows no image when it is absent, so a clone still
+# builds. Drop your own copy in ui/SHHToolkit/ if you want the header image.
+ui/SHHToolkit/logo.png
+ui/SHHToolkit/icon.ico
+
+# scratch data from live debugging sessions
+savepoint_backup.json
+
+# Ghidra project (~1 GB, and its .rep contains a full copy of the module)
+ghidra/
+*.gpr
+*.rep/
+*.lock
+*.lock~
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Third-party capture tooling and its output (downloaded, not ours)
+apitrace/
+*.trace
+*.7z
+ui/dist/
