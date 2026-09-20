@@ -1,0 +1,13 @@
+Silent Hill: Homecoming PC Speedrunning Toolkit
+Copyright (c) 2026 thetofusurvivor_
+
+The MIT licence in LICENSE covers this patcher and its documentation only.
+
+Silent Hill: Homecoming, its code, data and artwork are the property of Konami
+and Double Helix Games. No part of the game is included in or distributed with
+this project. This is a patcher, not the game: it requires a copy you already
+own, and it modifies that copy in place after making a backup.
+
+The toolkit displays the game's logo in its header only when a logo.png is
+present in ui/SHHToolkit/. That file is deliberately not distributed here. The
+application builds and runs without it, showing a text-only header.
