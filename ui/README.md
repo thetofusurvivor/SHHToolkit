@@ -16,9 +16,12 @@ ui/SHHToolkit/
   Services/
     GameLocator.cs      finds Bin\g_SilentHill.sgl via the registry + libraryfolders.vdf
     BinaryPatch.cs      guarded byte edits with .orig backup
-    GamePatches.cs      FPS cap, borderless, unlocks, crash guard (stub generated in code)
-    ConfigPatches.cs    cutscene skip and the mouse bindings, as marked config blocks
-    RuntimeHook.cs      the practice checkpoint key, written into the running game
+    GamePatches.cs      FPS cap, borderless, crash guard (stub generated in code)
+    ConfigPatches.cs    the mouse bindings, as a marked config block
+    SpeedPatch.cs       the frame-delta hook, its clamp, and live retuning
+    UnlockPatch.cs      per-item costumes and the Laser Gun
+    HealthLock.cs       removes the instruction that applies health changes
+    GameProcess.cs      finding the game and reading/writing its memory
 ```
 
 ## Build
@@ -72,15 +75,13 @@ locked - close it and re-run.
   Pre-rendered movies run on Bink's own clock and are unaffected; in-engine scripted scenes
   run in the ordinary tick, so those do speed up.
 * **Game files** (game must be closed): borderless windowed, all costumes + the New Game+
-  extras, the flashlight-crash guard, skippable pre-rendered cutscenes, and the mouse
-  bindings (Esc on the thumb button, weapon cycling on the wheel click).
-* **Practice** (game must be running), runtime only - writes nothing to disk, gone when the
-  game exits:
-  * an **F5 key** that sets the checkpoint the game restores you to;
-  * **Lock health** - the engine applies every health change through a single instruction,
-    and this removes it, so Alex stops taking damage. It blocks *healing* too, for the same
-    reason, and it guards only that path: a scripted death or an instant kill could still
-    get you. The row shows your live health while the game runs.
+  extras, the flashlight-crash guard, and the mouse bindings (Esc on the thumb button, weapon cycling on the wheel click).
+* **Practice** (game must be running), runtime only — writes nothing to disk, gone when
+  the game exits:
+  * **Lock health** — the engine applies every health change through a single
+    instruction, and this removes it, so Alex stops taking damage. It blocks *healing*
+    too, for the same reason, and it guards only that path: scripted attacks still get
+    through. The row shows your live health while the game runs.
 * **Restore everything** puts the game back to stock.
 
 ## Safety rules it follows
@@ -89,7 +90,7 @@ locked - close it and re-run.
   are neither "stock" nor "already patched" - a different build cannot be corrupted.
 * A `.orig` copy of any file is made before the first write to it.
 * File patches are blocked while the game is running (Windows locks the module), and the
-  runtime hook suspends the game's threads while it rewrites bytes that execute every frame.
+  runtime features suspend the game's threads while rewriting bytes it may be executing.
 
 ## A note on the logo
 

@@ -10,8 +10,7 @@ flip - verified live: during a confirmed cutscene the ICutscene global
 (0x11596118) stays NULL and the main-thread stack shows no cutscene player at
 all, only the ordinary TickLoop. Those scenes are scripted sequences running
 inside the normal game tick, so there is no playback object for
-COMMAND_SKIP_CUTSCENE to abort. (Pre-rendered Bink movies ARE skippable - see
-`allowgameskipmovie` in README.)
+COMMAND_SKIP_CUTSCENE to abort.
 
 The engine's own "cutscene fast-forward mode" was never a cut-to-end either; it
 was time acceleration. This patch exposes exactly that, generally.
@@ -28,7 +27,7 @@ This patch redirects that store through a code cave which scales it first, then
 clamps it:
 
     mulss xmm0, [g_speedFactor]     ; a float we control, DEFAULT 1.0
-    minss xmm0, [g_maxDelta]        ; a ceiling, DEFAULT 0.1 s
+    minss xmm0, [g_maxDelta]        ; a ceiling, DEFAULT 0.05 s
     movss [0x116C7A14], xmm0
     jmp   back
 
@@ -54,7 +53,7 @@ Layout
 ------
     patch site    0x00A4E99C   8 bytes  ->  jmp cave + 3 nops
     g_speedFactor 0x00D71300   4 bytes  float, default 1.0
-    g_maxDelta    0x00D71304   4 bytes  float, default 0.1
+    g_maxDelta    0x00D71304   4 bytes  float, default 0.05
     cave code     0x00D71310  29 bytes
 
 Both cave addresses were verified to be 0xCC padding inside a 647 KB unused run

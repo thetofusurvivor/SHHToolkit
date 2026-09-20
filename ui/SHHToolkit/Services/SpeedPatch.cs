@@ -138,15 +138,15 @@ public static class SpeedPatch
     /// </summary>
     public static bool TryWriteLive(double factor)
     {
-        var proc = RuntimeHook.FindGame();
+        var proc = GameProcess.Find();
         if (proc is null) return false;
         try
         {
-            using var h = RuntimeHook.OpenProcessHandle(proc);
-            var stub = RuntimeHook.ReadMemory(h, (uint)(Base + CodeOffset), Stub.Length);
+            using var h = GameProcess.Open(proc);
+            var stub = GameProcess.Read(h, (uint)(Base + CodeOffset), Stub.Length);
             if (!stub.AsSpan().SequenceEqual(Stub)) return false;    // patch not in this process
-            RuntimeHook.WriteMemory(h, (uint)(Base + FactorOffset), BitConverter.GetBytes(Clamp(factor)));
-            RuntimeHook.WriteMemory(h, (uint)(Base + MaxDeltaOffset), BitConverter.GetBytes(DefaultMaxDelta));
+            GameProcess.Write(h, (uint)(Base + FactorOffset), BitConverter.GetBytes(Clamp(factor)));
+            GameProcess.Write(h, (uint)(Base + MaxDeltaOffset), BitConverter.GetBytes(DefaultMaxDelta));
             return true;
         }
         catch (Exception) { return false; }
@@ -155,12 +155,12 @@ public static class SpeedPatch
     /// <summary>The multiplier the running game is actually using, if it can be read.</summary>
     public static float? ReadLive()
     {
-        var proc = RuntimeHook.FindGame();
+        var proc = GameProcess.Find();
         if (proc is null) return null;
         try
         {
-            using var h = RuntimeHook.OpenProcessHandle(proc);
-            var v = BitConverter.ToSingle(RuntimeHook.ReadMemory(h, (uint)(Base + FactorOffset), 4));
+            using var h = GameProcess.Open(proc);
+            var v = BitConverter.ToSingle(GameProcess.Read(h, (uint)(Base + FactorOffset), 4));
             return float.IsFinite(v) && v is > 0 and <= 100 ? v : null;
         }
         catch (Exception) { return null; }

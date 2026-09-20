@@ -33,12 +33,12 @@ public static class HealthLock
 
     public static PatchState Read()
     {
-        var proc = RuntimeHook.FindGame();
+        var proc = GameProcess.Find();
         if (proc is null) return PatchState.Unknown;
         try
         {
-            using var h = RuntimeHook.OpenProcessHandle(proc);
-            var cur = RuntimeHook.ReadMemory(h, Store, Original.Length);
+            using var h = GameProcess.Open(proc);
+            var cur = GameProcess.Read(h, Store, Original.Length);
             if (cur.AsSpan().SequenceEqual(Original)) return PatchState.Stock;
             if (cur.AsSpan().SequenceEqual(Removed)) return PatchState.Patched;
             return PatchState.Unknown;
@@ -48,10 +48,10 @@ public static class HealthLock
 
     public static void Set(bool locked)
     {
-        var proc = RuntimeHook.FindGame()
+        var proc = GameProcess.Find()
                    ?? throw new InvalidOperationException("The game is not running.");
-        using var h = RuntimeHook.OpenProcessHandle(proc);
-        var cur = RuntimeHook.ReadMemory(h, Store, Original.Length);
+        using var h = GameProcess.Open(proc);
+        var cur = GameProcess.Read(h, Store, Original.Length);
         if (!cur.AsSpan().SequenceEqual(Original) && !cur.AsSpan().SequenceEqual(Removed))
             throw new InvalidOperationException(
                 "The bytes where the health store should be are not what this build has, "
@@ -59,24 +59,24 @@ public static class HealthLock
 
         // The instruction only runs when something changes Alex's health, but suspending
         // first means it cannot be mid-instruction while the bytes are swapped.
-        RuntimeHook.WithGameSuspended(proc, () =>
-            RuntimeHook.WriteMemory(h, Store, locked ? Removed : Original));
+        GameProcess.WithSuspended(proc, () =>
+            GameProcess.Write(h, Store, locked ? Removed : Original));
     }
 
     /// <summary>"100 / 150", or null when it cannot be read.</summary>
     public static string? ReadHealth()
     {
-        var proc = RuntimeHook.FindGame();
+        var proc = GameProcess.Find();
         if (proc is null) return null;
         try
         {
-            using var h = RuntimeHook.OpenProcessHandle(proc);
-            var root = BitConverter.ToUInt32(RuntimeHook.ReadMemory(h, PlayerRoot, 4));
+            using var h = GameProcess.Open(proc);
+            var root = BitConverter.ToUInt32(GameProcess.Read(h, PlayerRoot, 4));
             if (root == 0) return null;
-            var player = BitConverter.ToUInt32(RuntimeHook.ReadMemory(h, root + 4, 4));
+            var player = BitConverter.ToUInt32(GameProcess.Read(h, root + 4, 4));
             if (player == 0) return null;
-            var hp = BitConverter.ToSingle(RuntimeHook.ReadMemory(h, player + HealthField, 4));
-            var max = BitConverter.ToSingle(RuntimeHook.ReadMemory(h, player + MaxHealthField, 4));
+            var hp = BitConverter.ToSingle(GameProcess.Read(h, player + HealthField, 4));
+            var max = BitConverter.ToSingle(GameProcess.Read(h, player + MaxHealthField, 4));
             if (!float.IsFinite(hp) || !float.IsFinite(max) || max <= 0 || max > 10000) return null;
             return string.Format("{0:0.#} / {1:0.#} health", hp, max);
         }

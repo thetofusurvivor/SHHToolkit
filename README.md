@@ -37,11 +37,9 @@ That is precisely correct. It came down to a single float.
 | **Frame rate cap** | Removes the hard-coded **30 FPS** limit. Pick 60 / 120 / 144 / your refresh rate, or uncapped. |
 | **Gameplay speed** | **1x–4x** time scaling for practising a route. Capped at 4x (collision tunnels above that), with the scaled frame delta clamped tighter than the engine's own limit. Changeable *while you play*. |
 | **Borderless windowed** | Stops the game minimising when you alt-tab, by patching how it creates its window. |
-| **Skippable cutscenes** | Makes the ~9 minutes of pre-rendered (Bink) movies skippable. Config only, no patching. |
 | **All costumes + Laser Gun** | Per-item checkboxes, without replaying the game for each ending. Your save file is never touched. |
 | **Crash guard** | Guards a crash that hits during level loads (the flashlight re-attach bug). |
 | **Mouse bindings** | Esc on a thumb button, weapon cycling on the wheel click. Config only. |
-| **Practice: checkpoint key** | F5 sets the checkpoint the game restores you to. Runtime only. |
 | **Practice: lock health** | Alex stops taking damage. Runtime only. Blocks healing too, and scripted attacks still get through — see [NOTES.md](NOTES.md). |
 
 ## Safety
@@ -133,45 +131,6 @@ frame; see [NOTES.md](NOTES.md).
 
 ---
 
-## Skippable pre-rendered (Bink) cutscenes
-
-**In the toolkit:** *Game files* → **Skippable cutscenes** (game closed).
-
-Add one line to `Engine\default_pc.cfg` (tab before the `=`, matching the existing
-style). Close the game first — the file is read at startup.
-
-```
-allowgameskipmovie	= 1
-```
-
-Then **Escape** (or controller **Button 8**) skips the pre-rendered cutscenes.
-
-> This covers the **Bink video** cutscenes only. The real-time **in-engine** scenes
-> cannot be skipped at all — there is no cutscene object to abort (proven, see
-> [NOTES.md](NOTES.md)). Use the [speed multiplier](#game-speed-multiplier--cutscene-fast-forward)
-> for those.
-
-### Why it was broken
-
-Not one long video — all ten Bink files are ≤ 2m48s. But the story cinematics add
-up to roughly **9 minutes**, which is the "7 minutes behind" from the thread.
-
-`COMMAND_SKIP_CUTSCENE` is already bound on PC (`binds_pc_mjs.cfg` maps it to
-`KEY_ESCAPE`, and to controller `BUTTON_8`), so the input path was never the
-problem. The skip is refused by a config flag on a second config object:
-
-| flag | shipped value | effect |
-|---|---|---|
-| `allowskipmovie` | 1 | intro movies skip fine |
-| `allowSkippableLevelIntroMovies` | 1 | level intros skip fine |
-| **`allowgameskipmovie`** | **0** | **in-game story movies refused** |
-
-`allowgameskipmovie` defaults to false and ships in no config file, so there was no
-way to turn it on without knowing the key existed. Setting it costs nothing and
-touches no game code.
-
----
-
 ## Game speed multiplier / cutscene fast-forward
 
 **In the toolkit:** *Game speed* → pick 1x–4x and **Apply**. Set it with the game
@@ -191,8 +150,7 @@ during a confirmed cutscene the `ICutscene` global (`0x11596118`) stayed **NULL*
 with a probe polling 5x/sec, and the main-thread stack showed **no cutscene
 player** — only the ordinary `TickLoop`. Those scenes are scripted sequences
 running inside the normal game tick, so there is no playback object for
-`COMMAND_SKIP_CUTSCENE` to abort. (Pre-rendered Bink movies *are* skippable — see
-above.)
+`COMMAND_SKIP_CUTSCENE` to abort.
 
 The engine's own "cutscene fast-forward mode" was never a cut-to-end either; it
 was time acceleration. This exposes that generally.
@@ -383,42 +341,9 @@ Notes from working this out:
 
 ---
 
-## Practice: checkpoint key
+## Practice: lock health
 
-**In the toolkit:** *Practice* → **Checkpoint key**, and **Lock health** beside it.
-Both need the game **running**.
-
-For speedrun practice: press **F5** in game to set the checkpoint the game restores you
-to, anywhere, not just at save points.
-
-```bash
-python shh_practice.py            # after launching the game
-python shh_practice.py --key F6
-python shh_practice.py --status   # frames seen / presses / checkpoints set
-python shh_practice.py --remove
-```
-
-Runtime only: it writes nothing to the game's files and is gone when the game exits.
-
-**It is not a save.** It calls the engine's own `SaveCheckpoint`
-(`0x10991560` on the manager at `[0x116C1020]`), which sets the checkpoint you respawn
-at and writes **nothing to disk**.
-
-Saving anywhere was pursued hard and does not work. The engine's slot function
-(`SaveToSlot`, `0x10A0C730`) only updates in-memory slot metadata; the actual disk write
-is asynchronous and pumped by the save screen's own update loop, which does not exist
-during play. Calling it from a frame hook runs cleanly and saves nothing. Moving a save
-point onto the player and hunting for a "you can save here" flag both failed too — all
-three routes, and how each was disproved, are in [NOTES.md](NOTES.md).
-
-How it hooks: one scratch page in the game holds the key state and counters; a stub in
-unused `0xCC` padding at `0x10D71600` polls the key with `GetAsyncKeyState` (already
-imported by the game), edge-detects the press, and calls `SaveCheckpoint`. The first five
-bytes of the frame limiter (`0x10A4CC90`, once per frame) jump to it, and the stub then
-runs the instructions it displaced, including the relative `call` re-encoded for its new
-address. All game threads are suspended while those bytes are written.
-
-### Practice: lock health
+**In the toolkit:** *Practice* → **Lock health**. It needs the game **running**.
 
 Health is `player+0x164` (float, maximum at `+0x168`) and does not regenerate. Every
 health change — damage *and* healing — goes through a single instruction:
@@ -430,7 +355,7 @@ health change — damage *and* healing — goes through a single instruction:
 ```
 
 With the store gone, health is read, adjusted and discarded, so the value never moves.
-Runtime only, like the checkpoint key.
+Runtime only: nothing is written to disk, and it is gone when the game exits.
 
 Two limits, both confirmed in play rather than assumed: it blocks **healing** as well,
 since that is the same instruction; and **scripted attacks still kill you**, so those
@@ -576,8 +501,8 @@ Other complaints from the same thread, not yet investigated:
 - [x] **Controls (rest)** — Esc on a mouse side button, weapon cycling on the wheel
       click *(bindings; see [Controls](#controls-esc-and-weapon-switching-on-the-mouse))*
 - [ ] **Lag/stutter** — "more lag somehow, which can get pretty bad on certain sections"
-- [x] **Unskippable cutscenes** — `allowgameskipmovie` defaulted to false; one config
-      line, ~9 minutes of story cinematics now skippable
+- [x] **Unskippable cutscenes** — in-engine scenes cannot be skipped at all (proven, see
+      [NOTES.md](NOTES.md)); the speed multiplier is the answer for those
 
 Practice tooling beyond the thread:
 
@@ -606,7 +531,7 @@ ui/SHHToolkit/         the toolkit (.NET 8 / WPF) — see ui/README.md
     SpeedPatch.cs      gameplay speed: the delta hook, its clamp, live retuning
     ConfigPatches.cs   cutscene skip and mouse bindings (Engine\*.cfg)
     UnlockPatch.cs     per-item costumes and the Laser Gun
-    RuntimeHook.cs     the per-frame hook: practice checkpoint key
+    GameProcess.cs     finding the game and reading/writing its memory
     HealthLock.cs      removes the instruction that applies health changes
 README.md              this file
 NOTES.md               the reverse-engineering handoff: addresses, live-verified

@@ -37,38 +37,6 @@ public abstract class ConfigPatch(string name, string description)
     protected const string End = "### [SHH Toolkit] end ";
 }
 
-/// <summary>allowgameskipmovie: lets Esc skip the pre-rendered (Bink) cutscenes.</summary>
-public sealed class CutsceneSkipPatch() : ConfigPatch(
-    "Skippable pre-rendered cutscenes",
-    "The game ships with movie skipping disabled. This turns it on, so Esc skips the "
-    + "pre-rendered cutscenes (roughly 9 minutes of them). In-engine scenes cannot be skipped.")
-{
-    private const string Key = "allowgameskipmovie";
-
-    public override string FilePath(string modulePath) =>
-        Path.Combine(GameLocator.EngineDir(modulePath), "default_pc.cfg");
-
-    public override bool IsApplied(string modulePath) =>
-        File.ReadLines(FilePath(modulePath))
-            .Any(l => l.TrimStart().StartsWith(Key, StringComparison.OrdinalIgnoreCase)
-                      && l.Contains('1'));
-
-    public override void Apply(string modulePath, bool restore)
-    {
-        var path = FilePath(modulePath);
-        EnsureBackup(path);
-        var text = File.ReadAllText(path);
-        var eol = text.Contains("\r\n") ? "\r\n" : "\n";
-        var lines = text.Split(eol).ToList();
-        lines.RemoveAll(l => l.TrimStart().StartsWith(Key, StringComparison.OrdinalIgnoreCase));
-        if (!restore)
-        {
-            var insert = lines.FindLastIndex(l => l.Contains('=')) + 1;
-            lines.Insert(Math.Max(insert, 0), Key + "\t= 1");
-        }
-        File.WriteAllText(path, string.Join(eol, lines));
-    }
-}
 
 /// <summary>Mouse bindings: Esc on the side button, weapon cycling on the wheel click.</summary>
 public sealed class MouseBindsPatch() : ConfigPatch(

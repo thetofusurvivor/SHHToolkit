@@ -14,9 +14,9 @@ Last session: 2026-09-19.
 | 30 FPS cap despite a 144 Hz option | **Fixed** — `shh_fps_patch.py` |
 | Controls: mouse escapes to other monitors | **Fixed, provisionally** — `shh_window_fix.py`, now cursor-lock-only by default |
 | Auto-minimises when you tab out | **Fixed** — `shh_borderless_patch.py` (2 x 4 bytes, replaces that helper) |
-| Unskippable **Bink movie** cutscenes | **Fixed** — one line in `default_pc.cfg` (user-confirmed) |
+| Unskippable **Bink movie** cutscenes | **Fixed** — one line in `default_pc.cfg` (user-confirmed). Dropped from the toolkit 2026-09-20 |
 | Unskippable **in-engine** cinematics | **Cannot be skipped** — proven: no cutscene object exists. Mitigated by the speed patch |
-| Game speed multiplier / fast-forward | **Shipped** — `shh_speed_patch.py` + `shh_speed.py` (user-confirmed working at 8x) |
+| Game speed multiplier / fast-forward | **Shipped in the toolkit**, 1x-4x with a delta clamp (user-confirmed 2026-09-20) |
 | Crashes "at many different points" | **Mostly resolved** — the external window restyling caused most of them; the flashlight crash is now guarded (`shh_crashfix_patch.py`), the Havok phantom one is not |
 | Q&A dialogue scenes (DialogueTree) | **No skip exists in the engine** — mapped, no safe invocation path found |
 | True frame-rate ceiling / does `vsync` cvar work? | Open — measurement was confounded |
@@ -24,12 +24,13 @@ Last session: 2026-09-19.
 | Lag and stutter in certain sections | Not started |
 | Unskippable PS3/PC-exclusive cutscene (~7 min) | Not started |
 | Weapon switching / Esc on the mouse | **Fixed** — `binds_pc_mjs.cfg`: wheel click cycles weapons, side button = Esc (user-confirmed) |
-| One costume per ending; Laser Gun needs the UFO ending | **Unlocked** — `shh_unlock_patch.py` (costumes user-confirmed) |
-| Quicksave anywhere for practice | **Partly** — checkpoint key works (`shh_practice.py`); a real disk save from arbitrary places crashes, see below |
+| One costume per ending; Laser Gun needs the UFO ending | **Unlocked** — per-item in the toolkit (costumes user-confirmed) |
+| Dying while practising a fight | **Fixed** — health lock in the toolkit (user-confirmed 2026-09-20) |
+| Quicksave anywhere for practice | **Not possible** — every route closed, see below. The checkpoint key was built, found useless and removed |
 
-Current install state: **144 FPS cap patch only** (4 bytes at `0x0108E804`).
-`Engine\default_pc.cfg` carries `allowgameskipmovie = 1`. The speed patch was
-applied, confirmed working up to 9.5x, then **reverted** — see the crash notes.
+The toolkit (`ui/SHHToolkit`) is the product; the `shh_*.py` scripts are the research
+record. The checkpoint key and the Bink cutscene skip were removed from it on
+2026-09-20 - the first because it records no position, the second at the user's request.
 
 ### Crash analysis — 2026-09-14 (supersedes everything below)
 
@@ -186,7 +187,11 @@ running at 120 FPS with `fpsLimit` still at its stock `30`.
 
 ---
 
-## Unskippable cutscenes — fixed
+## Unskippable cutscenes — fixed, then dropped from the toolkit
+
+> **Removed from the toolkit 2026-09-20** at the user's request, along with the
+> checkpoint key. The one-line config change below still works if you want it by hand;
+> it is simply no longer one of the toolkit's rows.
 
 **The complaint is cumulative, not one long video.** All ten Bink files are
 1280x720 @ ~29.97 fps and none exceeds 2m48s:
@@ -1017,6 +1022,11 @@ ends, where writes held and changed nothing). What proved this field real was th
 catching the game itself writing decreasing values into it as damage landed.
 
 ## Quicksave / practice checkpoints (2026-09-19)
+
+> **Removed from the toolkit 2026-09-20.** The checkpoint key worked exactly as
+> described below and was still not useful: it records no position, so it does not do
+> what a practice quicksave needs to do. The research stays here because it is what
+> ruled the approach out.
 
 **What works:** `SaveCheckpoint`, a script command the engine already has:
 

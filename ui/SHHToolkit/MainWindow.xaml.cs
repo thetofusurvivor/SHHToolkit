@@ -13,7 +13,6 @@ public partial class MainWindow : Window
     private string? _module;
     private readonly List<FeatureRow> _fileRows = [];
     private readonly List<FeatureRow> _runtimeRows = [];
-    private const ushort CheckpointKey = 0x74;   // F5
 
     private static readonly (string Label, double Fps)[] FpsChoices =
     [
@@ -87,7 +86,6 @@ public partial class MainWindow : Window
 
         var configs = new (ConfigPatch Patch, string Summary)[]
         {
-            (new CutsceneSkipPatch(), "Esc skips the pre-rendered movies"),
             (new MouseBindsPatch(), "Esc on the thumb button, weapons on the wheel click")
         };
         foreach (var (patch, summary) in configs)
@@ -99,31 +97,6 @@ public partial class MainWindow : Window
                 GetState = () => _module is null ? PatchState.Unknown : patch.Read(_module),
                 Set = on => patch.Apply(_module!, !on)
             });
-
-        _runtimeRows.Add(new FeatureRow
-        {
-            Name = "Checkpoint key (state only)",
-            Summary = "F5 snapshots health/ammo state - not your position",
-            Tooltip = "Press F5 to run the engine's own SaveCheckpoint: it snapshots health, "
-                    + "weapons, ammo and persistent data.\n\nIt does NOT record where you are "
-                    + "standing - that code contains no position at all. On death the game returns "
-                    + "you to the last checkpoint volume you walked through, not to where you "
-                    + "pressed F5.\n\nIt is also not a save: nothing is written to disk, and the "
-                    + "hook lives in the game's memory only, disappearing when it exits.",
-            RequiresGameRunning = true,
-            GetState = () => !RuntimeHook.IsGameRunning()
-                ? PatchState.Unknown
-                : RuntimeHook.Read().Installed ? PatchState.Patched : PatchState.Stock,
-            GetDetail = () =>
-            {
-                var s = RuntimeHook.Read();
-                return s.Installed
-                    ? string.Format("{0:n0} frames   {1} presses   {2} checkpoints",
-                                    s.Frames, s.Presses, s.Checkpoints)
-                    : null;
-            },
-            Set = on => { if (on) RuntimeHook.Install(CheckpointKey); else RuntimeHook.Remove(); }
-        });
 
         _runtimeRows.Add(new FeatureRow
         {
@@ -183,7 +156,7 @@ public partial class MainWindow : Window
     /// <summary>Everything that can change while the window is open.</summary>
     private void RefreshLive()
     {
-        var running = RuntimeHook.IsGameRunning();
+        var running = GameProcess.IsRunning();
         WarnText.Visibility = running ? Visibility.Visible : Visibility.Collapsed;
         if (running)
             WarnText.Text = "Game is running: file patches are locked until you close it. "
@@ -213,7 +186,7 @@ public partial class MainWindow : Window
         if (_module is null) { SpeedDetail.Text = ""; return; }
         var state = SpeedPatch.ReadState(_module);
         var inFile = SpeedPatch.ReadFactor(_module) ?? 1f;
-        var live = RuntimeHook.IsGameRunning() ? SpeedPatch.ReadLive() : null;
+        var live = GameProcess.IsRunning() ? SpeedPatch.ReadLive() : null;
 
         SpeedDetail.Text = state switch
         {
@@ -262,7 +235,7 @@ public partial class MainWindow : Window
             row.Refresh();
             return;
         }
-        if (!row.RequiresGameRunning && RuntimeHook.IsGameRunning())
+        if (!row.RequiresGameRunning && GameProcess.IsRunning())
         {
             Log("Close the game first: Windows locks " + GameLocator.ModuleName + " while it is loaded.");
             row.Refresh();
@@ -305,7 +278,7 @@ public partial class MainWindow : Window
         if (_module is null) { Log("Pick the game first."); return; }
         var choice = SpeedChoices[Math.Max(SpeedCombo.SelectedIndex, 0)];
 
-        if (RuntimeHook.IsGameRunning())
+        if (GameProcess.IsRunning())
         {
             if (SpeedPatch.TryWriteLive(choice.Factor))
                 Log("Gameplay speed: " + choice.Label + " - applied to the running game.");
@@ -371,10 +344,8 @@ public partial class MainWindow : Window
     private void OnRestoreAllClick(object sender, RoutedEventArgs e)
     {
         if (_module is null) return;
-        if (RuntimeHook.IsGameRunning())
+        if (GameProcess.IsRunning())
         {
-            try { RuntimeHook.Remove(); Log("Practice hook removed."); }
-            catch (Exception ex) { Log("Could not remove the practice hook: " + ex.Message); }
             try
             {
                 if (HealthLock.Read() == PatchState.Patched) { HealthLock.Set(false); Log("Health lock removed."); }
@@ -401,7 +372,7 @@ public partial class MainWindow : Window
     private bool CanPatch()
     {
         if (_module is null) { Log("Pick the game first."); return false; }
-        if (RuntimeHook.IsGameRunning())
+        if (GameProcess.IsRunning())
         {
             Log("Close the game first: Windows locks " + GameLocator.ModuleName + " while it is loaded.");
             return false;
