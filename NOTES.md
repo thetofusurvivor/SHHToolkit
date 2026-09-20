@@ -9,6 +9,32 @@ Last session: 2026-09-19.
 
 ## Status
 
+**Published 2026-09-20: https://github.com/thetofusurvivor/SHHToolkit** (public, MIT,
+release `v0.1.0-beta` with the portable 63 MB `SHHToolkit.exe` attached).
+
+**The toolkit is the product.** `ui/SHHToolkit` is where features ship; the `shh_*.py`
+scripts are the research record and are not kept at feature parity.
+
+### Where things stand, 2026-09-20
+
+| | |
+|---|---|
+| Shipped and user-confirmed | FPS cap, borderless, per-item unlocks, crash guard, mouse bindings, gameplay speed 1x-4x, lock health |
+| Removed from the toolkit | practice checkpoint key (records no position), Bink cutscene skip (user's request; the config line still works by hand) |
+| Closed, will not be retried | save anywhere - every route disproved, see below |
+| Open | map/journal clipping >720p, lag/stutter, true frame-rate ceiling, the Havok phantom crash (diagnosed, unguarded) |
+
+### If you pick this up next
+
+* **Read the dead ends before proposing anything.** Save-anywhere, position warping and
+  the save-point move each looked obvious and each failed for a reason recorded here.
+* **A write that holds proves nothing in this game.** Position and save-point writes both
+  held and changed nothing on screen. Confirm by catching the *engine* writing a field
+  (hardware watchpoint), or by what the player sees.
+* **Every check needs a control.** Verifications that "passed" while being structurally
+  incapable of failing cost real time on 2026-09-20 - see the measurement pitfalls.
+
+
 | Issue from the [forum thread](https://www.speedrun.com/shh/forums/kl01r) | Status |
 |---|---|
 | 30 FPS cap despite a 144 Hz option | **Fixed** — `shh_fps_patch.py` |
